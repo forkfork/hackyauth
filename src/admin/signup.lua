@@ -1,11 +1,11 @@
 local sql = require('lib/sql')
-local cjson = require('cjson')
+local cjson = require('cjson.safe')
 
 _M = {}
 
 local create_query = [[
   INSERT INTO admin (
-    org_name,
+    org,
     name,
     email
   ) VALUES (
@@ -23,7 +23,18 @@ function create_admin(db, org_name, name, email)
 end
 
 _M.go = function(db)
-  create_admin(db, "evilcorp", "Timothy Downs", "timothydowns@gmail.com")
+  
+  local data = ngx.req.get_body_data()
+  local org, name, email
+  local params = cjson.decode(data)
+  if params then
+    org = params.org
+    name = params.name
+    email = params.email
+    create_admin(db, org, name, email)
+  else
+    ngx.say([[{"code":"provide json body with object {org: org, name: name, email: email}"}]])
+  end
 end
 
 return _M
