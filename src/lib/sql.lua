@@ -1,6 +1,6 @@
-_M = {}
+local _M = {}
 
-_M.query = function(db, sql, arg1, arg2, arg3)
+_M.query = function(db, sql, arg1, arg2, arg3, arg4, arg5)
   
   local res
   local ok, err, errcode, sqlstate = db:connect{
@@ -19,7 +19,9 @@ _M.query = function(db, sql, arg1, arg2, arg3)
   local fmted_sql = string.format(sql, 
     arg1 and ngx.quote_sql_str(arg1),
     arg2 and ngx.quote_sql_str(arg2),
-    arg3 and ngx.quote_sql_str(arg3))
+    arg3 and ngx.quote_sql_str(arg3),
+    arg4 and ngx.quote_sql_str(arg4),
+    arg5 and ngx.quote_sql_str(arg5))
   res, err, errcode, sqlstate = db:query(fmted_sql)
   if not res then
     ngx.log(ngx.ERR, "failed to query: " .. tostring(err) .. ": " .. tostring(errcode) .. " " .. tostring(sqlstate))
