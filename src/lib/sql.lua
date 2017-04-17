@@ -12,7 +12,7 @@ _M.query = function(db, sql, arg1, arg2, arg3)
     max_packet_size = 1024 * 1024 }
 
   if not ok then
-    ngx.log(ngx.ERR, "failed to connect: " .. tostring(err) .. ": " .. tostring(errcode) .. " " tostring(sqlstate))
+    ngx.log(ngx.ERR, "failed to connect: " .. tostring(err) .. ": " .. tostring(errcode) .. " " .. tostring(sqlstate))
     return "err_db_connection_lost", nil
   end
   
@@ -22,7 +22,7 @@ _M.query = function(db, sql, arg1, arg2, arg3)
     arg3 and ngx.quote_sql_str(arg3))
   res, err, errcode, sqlstate = db:query(fmted_sql)
   if not res then
-    ngx.log(ngx.ERR, "failed to query: " .. tostring(err) .. ": " .. tostring(errcode) .. " " tostring(sqlstate))
+    ngx.log(ngx.ERR, "failed to query: " .. tostring(err) .. ": " .. tostring(errcode) .. " " .. tostring(sqlstate))
     return "err_db_sql_failed", nil
   end
   

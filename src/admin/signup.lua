@@ -1,3 +1,6 @@
+local sql = require('lib/sql')
+local cjson = require('cjson')
+
 _M = {}
 
 local create_query = [[
@@ -6,15 +9,21 @@ local create_query = [[
     name,
     email
   ) VALUES (
-    '%s',
-    '%s',
-    '%s',
-    '%s'
+    %s,
+    %s,
+    %s
   );
 ]]
 
 function create_admin(db, org_name, name, email)
-  create_query
-  local fmted_sql = string.format(create_query, org_name, name, email)
-  local res, err, errcode, sqlstate = db:query(fmted_sql)
+
+  local err, res = sql.query(db, create_query, org_name, name, email)
+  ngx.say(cjson.encode(res))
+  
 end
+
+_M.go = function(db)
+  create_admin(db, "evilcorp", "Timothy Downs", "timothydowns@gmail.com")
+end
+
+return _M
