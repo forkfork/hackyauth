@@ -15,14 +15,28 @@ local create_query = [[
     name,
     email,
     password,
-    salt
+    salt,
+    details
   ) VALUES (
     %s,
+    %s,    
     %s,
     %s,
     %s,
     %s
   );
+]]
+
+local check_org = [[
+  SELECT
+    org.org_name,
+    apikey.token
+  FROM
+    org, apikey
+  WHERE
+    org.org_name = %s AND
+    apikey.token = %s AND
+    apikey.org_name = 'admin'
 ]]
 
 function create(db, org_name, name, email, password)
@@ -36,7 +50,7 @@ function create(db, org_name, name, email, password)
   local salt = str.to_hex(resty_random.bytes(16))
   local hashed_pwd = hash(password, salt)
 
-  local err, res = sql.query(db, create_query, org_name, name, email, hashed_pwd, salt)
+  local err, res = sql.query(db, create_query, org_name, name, email, hashed_pwd, salt, details)
   if err == 1062 then
     say_err('already_registered')
     return
@@ -56,14 +70,15 @@ end
 _M.go = function(db)
   
   local data = ngx.req.get_body_data()
-  local org, name, email, password
+  local org, name, email, password, details
   local params = cjson.decode(data)
   if params then
     org = params.org
     name = params.name
     email = params.email
     password = params.password
-    create(db, org, name, email, password)
+    details = params.details or '{}'
+    create(db, org, name, email, password, details)
   else
     ngx.say([[{"code":"provide json body with org, name, email, password}"}]])
   end
