@@ -1,0 +1,1 @@
+skill -HUP nginx

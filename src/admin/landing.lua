@@ -31,6 +31,7 @@ local _M = {}
 _M.go = function()
 
   ngx.say("hi")
+  ngx.say(ngx.var.http_host)
 
 end
 

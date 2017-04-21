@@ -13,7 +13,7 @@ _M.query = function(db, sql, arg1, arg2, arg3, arg4, arg5)
 
   if not ok then
     ngx.log(ngx.ERR, "failed to connect: " .. tostring(err) .. ": " .. tostring(errcode) .. " " .. tostring(sqlstate))
-    return "err_db_connection_lost", nil
+    return errcode, nil
   end
   
   local fmted_sql = string.format(sql, 
@@ -24,8 +24,8 @@ _M.query = function(db, sql, arg1, arg2, arg3, arg4, arg5)
     arg5 and ngx.quote_sql_str(arg5))
   res, err, errcode, sqlstate = db:query(fmted_sql)
   if not res then
-    ngx.log(ngx.ERR, "failed to query: " .. tostring(err) .. ": " .. tostring(errcode) .. " " .. tostring(sqlstate))
-    return "err_db_sql_failed", nil
+    ngx.log(ngx.ERR, "failed to query: " .. tostring(err) .. " errcode: " .. tostring(errcode) .. " sqlstate: " .. tostring(sqlstate))
+    return errcode, nil
   end
   
   return nil, res

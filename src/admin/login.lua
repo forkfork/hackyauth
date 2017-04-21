@@ -14,7 +14,7 @@ local login_query = [[
 
 local _M = {}
 
-function login_admin(db, email, password)
+local function login_admin(db, email, password)
 
   local err, res = sql.query(db, login_query, email, password)
 
@@ -42,7 +42,7 @@ _M.go = function(db)
     email = params.email
     password = params.password
   end
-  login_admin(db, email, password)
+  --login_admin(db, email, password)
 end
 
 return _M
