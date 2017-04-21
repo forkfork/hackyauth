@@ -5,7 +5,8 @@ CREATE TABLE user (
   email varchar(255),
   password text,
   salt text,
-  details varchar(2048)
+  details varchar(2048),
+  is_admin boolean DEFAULT false
 ) DEFAULT CHARSET=utf8;
 
 CREATE UNIQUE INDEX user_org_email ON user(org_name, email);
