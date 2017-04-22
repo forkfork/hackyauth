@@ -12,12 +12,13 @@ local login_query = [[
   FROM
     user
   WHERE
-    email = %s;
+    email = %s AND
+    org_name = %s;
 ]]
 
 local _M = {}
 
-function login(db, email, password)
+local login = function(db, email, password, org_name)
 
   local cookie, err = ck:new()
   if not cookie then
@@ -25,7 +26,7 @@ function login(db, email, password)
     return
   end
 
-  local err, res = sql.query(db, login_query, email, password)
+  local err, res = sql.query(db, login_query, email, org_name)
 
   if not res[1] then
     return say_err('not_found')
@@ -38,7 +39,7 @@ function login(db, email, password)
     return say_err('failed_auth')
   end
 
-  local token = authjwt.sign(email)
+  local token = authjwt.sign(email, org_name)
   cookie:set({
     key = "access_token",
     value = token,
@@ -51,12 +52,13 @@ end
 
 _M.go = function(db)
   local data = ngx.req.get_body_data()
-  local email, password
+  local email, password, org
   local params = cjson.decode(data)
   if params then
     email = params.email
     password = params.password
-    login(db, email, password)
+    org = params.org
+    login(db, email, password, org)
   end
 end
 

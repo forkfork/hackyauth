@@ -1,15 +1,16 @@
 DROP TABLE IF EXISTS user;
 CREATE TABLE user (
-  org_name varchar(32),
+  user_id char(12) NOT NULL,
+  org_name varchar(32) NOT NULL,
   name text,
   email varchar(255),
   password text,
   salt text,
-  details varchar(2048) DEFAULT '{}',
-  is_admin boolean DEFAULT false
+  detail varchar(2048) DEFAULT '{}'
 ) DEFAULT CHARSET=utf8;
 
 CREATE UNIQUE INDEX user_org_email ON user(org_name, email);
+CREATE UNIQUE INDEX user_org_id ON user(org_name, user_id);
 
 DROP TABLE IF EXISTS org;
 CREATE TABLE org (

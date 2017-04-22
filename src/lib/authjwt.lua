@@ -1,9 +1,11 @@
 local jwt = require('resty.jwt')
 local certs = require('lib.certs')
 
+jwt.set_alg_whitelist({RS256=1,HS256=0})
+
 _M = {}
 
-_M.sign = function(user)
+_M.sign = function(user, org_name)
   ngx.update_time()
   local time = ngx.time()
   local exp = time + (60 * 60 * 3) -- 3 hours
@@ -13,7 +15,8 @@ _M.sign = function(user)
     payload = {
       iat = time,
       exp = exp,
-      sub = user
+      sub = user,
+      iid = org_name
     }
   })
 

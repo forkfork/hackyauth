@@ -1,48 +1,45 @@
 local sql = require('lib/sql')
+local say_err = require('lib/errs')
 local hash = require('lib/hash')
+local authjwt = require('lib/authjwt')
 local cjson = require('cjson.safe')
+local ck = require('resty.cookie')
 
-local login_query = [[
+local validate_query = [[
   SELECT
-    password,
-    salt
+    detail
   FROM
     user
   WHERE
-    email = %s;
+    user_id = %s and
+    org_name = %s;
 ]]
 
 local _M = {}
 
-local function login(db, email, password)
+local validate = function(db, user_id, org_name)
 
-  local err, res = sql.query(db, login_query, email, password)
-
+  local err, res = sql.query(db, validate_query, 
+    assert(user_id, "user_id"),
+    assert(org_name, "org_name"))
   if not res[1] then
-    return ngx.say(cjson.encode{code='user_not_found'})
+    return say_err('not_found')
   end
 
-  local salt = res[1].salt
-  local db_hashed_pwd = res[1].password
-  local hashed_pwd = hash(password, salt)
-  if db_hashed_pwd ~= hashed_pwd then
-    ngx.say(cjson.encode{code='failed_auth'})
-    return 
-  end
-
-  return ngx.say(cjson.encode{code='success'})
-  
+  return ngx.say(cjson.encode{detail=res[1].detail})
 end
 
 _M.go = function(db)
-  local data = ngx.req.get_body_data()
-  local email, password
-  local params = cjson.decode(data)
-  if params then
-    email = params.email
-    password = params.password
+  local token, parsed_token, field
+  local cookie = ck:new()
+
+  field = cookie:get("access_token")
+  if not field then
+    return say_err('failed_auth')
   end
-  --login(db, email, password)
+  local verified, parsed_token = authjwt.validate(field)
+
+  validate(db, parsed_token.sub, parsed_token.iid)
 end
 
 return _M
