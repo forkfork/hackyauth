@@ -8,7 +8,8 @@ local ck = require('resty/cookie')
 local login_query = [[
   SELECT
     password,
-    salt
+    salt,
+    pub_info
   FROM
     user
   WHERE
@@ -32,6 +33,7 @@ local login = function(db, email, password, org_name)
     return say_err('not_found')
   end
 
+  local info = res[1].pub_info
   local salt = res[1].salt
   local db_hashed_pwd = res[1].password
   local hashed_pwd = hash(password, salt)
@@ -39,7 +41,7 @@ local login = function(db, email, password, org_name)
     return say_err('failed_auth')
   end
 
-  local token = authjwt.sign(email, org_name)
+  local token = authjwt.sign(email, org_name, cjson.decode(info))
   cookie:set({
     key = "access_token",
     value = token,

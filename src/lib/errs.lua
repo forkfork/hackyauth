@@ -2,6 +2,10 @@ local cjson = require('cjson')
 
 return function (code)
   local errs = {
+    bad_input = {
+      status = 400,
+      message = "Invalid input"
+    },
     not_found = {
       status = 404,
       message = "User not found"

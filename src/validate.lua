@@ -7,7 +7,10 @@ local ck = require('resty.cookie')
 
 local validate_query = [[
   SELECT
-    detail
+    name,
+    email,
+    priv_info,
+    pub_info
   FROM
     user
   WHERE
@@ -26,7 +29,14 @@ local validate = function(db, user_id, org_name)
     return say_err('not_found')
   end
 
-  return ngx.say(cjson.encode{detail=res[1].detail})
+  local priv_info_obj = cjson.decode(res[1].priv_info) or {}
+  local pub_info_obj = cjson.decode(res[1].pub_info) or {}
+
+  return ngx.say(cjson.encode{
+    name = res[1].name,
+    email = res[1].email,
+    priv_info = priv_info_obj,
+    pub_info = pub_info_obj})
 end
 
 _M.go = function(db)
@@ -38,6 +48,9 @@ _M.go = function(db)
     return say_err('failed_auth')
   end
   local verified, parsed_token = authjwt.validate(field)
+  if not parsed_token then
+    return say_err('failed_auth')
+  end
 
   validate(db, parsed_token.sub, parsed_token.iid)
 end
