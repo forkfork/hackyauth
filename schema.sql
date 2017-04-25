@@ -27,3 +27,10 @@ CREATE TABLE org (
 CREATE UNIQUE INDEX org_name ON org(name);
 
 INSERT INTO org (name, status) VALUES ('evilcorp', 'active');
+
+DROP TABLE IF EXISTS apikey;
+CREATE TABLE apikey (
+  org_name varchar(32) NOT NULL,
+  token varchar(32) NOT NULL,
+  description varchar(255)
+) DEFAULT CHARSET=utf8;

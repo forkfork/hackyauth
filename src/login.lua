@@ -22,26 +22,18 @@ local _M = {}
 local login = function(db, email, password, org_name)
 
   local cookie, err = ck:new()
-  if not cookie then
-    ngx.log(ngx.ERR, err)
-    return
-  end
-
   local err, res = sql.query(db, login_query, email, org_name)
 
   if not res[1] then
     return say_err('not_found')
   end
+  local row = res[1]
 
-  local info = res[1].pub_info
-  local salt = res[1].salt
-  local db_hashed_pwd = res[1].password
-  local hashed_pwd = hash(password, salt)
-  if db_hashed_pwd ~= hashed_pwd then
+  if row.password ~= hash(password, row.salt) then
     return say_err('failed_auth')
   end
 
-  local token = authjwt.sign(email, org_name, cjson.decode(info))
+  local token = authjwt.sign(email, org_name, cjson.decode(row.pub_info))
   cookie:set({
     key = "access_token",
     value = token,

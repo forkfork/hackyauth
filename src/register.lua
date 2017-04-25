@@ -45,10 +45,6 @@ local create_query = [[
 local function create(db, org_name, name, email, password, pub_info, priv_info)
 
   local cookie, err = ck:new()
-  if not cookie then
-    ngx.log(ngx.ERR, err)
-    return
-  end
 
   local salt = str.to_hex(resty_random.bytes(16))
   local hashed_pwd = hash(password, salt)
@@ -58,7 +54,6 @@ local function create(db, org_name, name, email, password, pub_info, priv_info)
     assert(org_name, "org_name"))
 
   if err or #res < 1 then
-    ngx.log(ngx.ERR, "BOLLOCKS" .. cjson.encode(res))
     return say_err('bad_input')
   end
 

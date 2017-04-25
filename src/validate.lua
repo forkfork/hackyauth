@@ -40,15 +40,8 @@ local validate = function(db, user_id, org_name)
 end
 
 _M.go = function(db)
-  local token, parsed_token, field
-  local cookie = ck:new()
-
-  field = cookie:get("access_token")
-  if not field then
-    return say_err('failed_auth')
-  end
-  local verified, parsed_token = authjwt.validate(field)
-  if not parsed_token then
+  local ok, parsed_token = authjwt.validate_cookie()
+  if not ok then
     return say_err('failed_auth')
   end
 

@@ -1,5 +1,6 @@
 local jwt = require('resty.jwt')
 local certs = require('lib.certs')
+local ck = require('resty.cookie')
 
 jwt.set_alg_whitelist({RS256=1,HS256=0})
 
@@ -24,10 +25,29 @@ _M.sign = function(user, org_name, info)
   return signed
 end
 
-_M.validate = function(token)
+local validate = function(token)
   local jwt_obj = jwt:verify(certs.cert, token)
 
   return jwt_obj.verified, jwt_obj.payload
+end
+
+_M.validate = validate
+
+_M.validate_cookie = function()
+  local token, parsed_token, field
+  local cookie = ck:new()
+
+  field = cookie:get("access_token")
+  if not field then
+    return false
+  end
+  for k, v in pairs(_M) do ngx.log(ngx.ERR, "KEY " .. k) end
+  local verified, parsed_token = validate(field)
+  if not parsed_token or not verified then
+    return false
+  end
+
+  return true, parsed_token
 end
 
 return _M
