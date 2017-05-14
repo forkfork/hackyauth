@@ -21,8 +21,12 @@ local _M = {}
 
 local login = function(db, email, password, org_name)
 
-  local cookie, err = ck:new()
+  local cookie, _ = ck:new()
   local err, res = sql.query(db, login_query, email, org_name)
+
+  if err then
+    ngx.log(ngx.ERR, "error in sql login_query: " .. tostring(err))
+  end
 
   if not res[1] then
     return say_err('not_found')
@@ -39,9 +43,9 @@ local login = function(db, email, password, org_name)
     value = token,
     max_age = 60*60*3
   })
-  
+
   return ngx.say(cjson.encode{token=token})
-  
+
 end
 
 _M.go = function(db)

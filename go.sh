@@ -34,4 +34,12 @@ curl -s -X POST -d '{"email":"user@example.com","password":"hunter2","org":"evil
 
 curl -s --cookie "access_token=$JWT" http://127.0.0.1:8080/validate
 
+JWT=$(curl -s -X POST -d '{"org":"smallauth","name":"tim","email":"user@example.com","password":"hunter2","pub_info":{"org":"smallauth"},"priv_info":{"b":2}}' http://127.0.0.1:8080/register | jq -r .token)
+echo $JWT
+curl -s --cookie "access_token=$JWT" -X POST http://127.0.0.1:8080/admin/apikey
+echo $JWT | wc -c
+
+curl -s -X POST -d '{"email":"user@example.com","org":"evilcorp"}' http://127.0.0.1:8080/forgot
+# email is sent
+
 #tail -n 20 ./logs/error.log

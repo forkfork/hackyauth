@@ -1,9 +1,7 @@
 local sql = require('lib/sql')
 local say_err = require('lib/errs')
-local hash = require('lib/hash')
 local authjwt = require('lib/authjwt')
 local cjson = require('cjson.safe')
-local ck = require('resty.cookie')
 
 local validate_query = [[
   SELECT
@@ -22,9 +20,12 @@ local _M = {}
 
 local validate = function(db, user_id, org_name)
 
-  local err, res = sql.query(db, validate_query, 
+  local err, res = sql.query(db, validate_query,
     assert(user_id, "user_id"),
     assert(org_name, "org_name"))
+  if err then
+    ngx.log(ngx.ERR, "Error at SQL validate_query: " .. tostring(err))
+  end
   if not res[1] then
     return say_err('not_found')
   end

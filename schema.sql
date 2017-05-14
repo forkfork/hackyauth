@@ -27,6 +27,7 @@ CREATE TABLE org (
 CREATE UNIQUE INDEX org_name ON org(name);
 
 INSERT INTO org (name, status) VALUES ('evilcorp', 'active');
+INSERT INTO org (name, status) VALUES ('smallauth', 'active');
 
 DROP TABLE IF EXISTS apikey;
 CREATE TABLE apikey (

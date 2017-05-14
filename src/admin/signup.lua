@@ -22,19 +22,22 @@ local create_query = [[
   );
 ]]
 
-function create_admin(db, org_name, name, email, password)
+local create_admin = function(db, org_name, name, email, password)
 
   local salt = str.to_hex(resty_random.bytes(16))
   local hashed_pwd = hash(password, salt)
 
   local err, res = sql.query(db, create_query, org_name, name, email, hashed_pwd, salt)
+  if not err then
+    ngx.say(ngx.ERR, "SQL error on create_query: " .. tostring(err))
+  end
 
   ngx.say(cjson.encode(res))
-  
+
 end
 
 _M.go = function(db)
-  
+
   local data = ngx.req.get_body_data()
   local org, name, email, password
   local params = cjson.decode(data)

@@ -33,7 +33,7 @@ local create_query = [[
   ) VALUES (
     %s,
     %s,
-    %s,    
+    %s,
     %s,
     %s,
     %s,
@@ -44,25 +44,26 @@ local create_query = [[
 
 local function create(db, org_name, name, email, password, pub_info, priv_info)
 
-  local cookie, err = ck:new()
+  local _, res, err
+  local cookie, _ = ck:new()
 
   local salt = str.to_hex(resty_random.bytes(16))
   local hashed_pwd = hash(password, salt)
   local user_id = uuid()
 
-  local err, res = sql.query(db, check_org_query,
+  err, res = sql.query(db, check_org_query,
     assert(org_name, "org_name"))
 
   if err or #res < 1 then
     return say_err('bad_input')
   end
 
-  err, res = sql.query(db, create_query, 
+  err, _ = sql.query(db, create_query,
     assert(user_id, "user_id"),
     assert(org_name, "org_name"),
     assert(name, "name"),
     assert(email, "email"),
-    assert(hashed_pwd, "hashed_pwd"), 
+    assert(hashed_pwd, "hashed_pwd"),
     assert(salt, "salt"),
     assert(pub_info, "pub_info"),
     assert(priv_info, "priv_info"))
@@ -76,13 +77,13 @@ local function create(db, org_name, name, email, password, pub_info, priv_info)
     value = token,
     max_age = 60*60*3
   })
-  
+
   return ngx.say(cjson.encode{token=token})
-  
+
 end
 
 _M.go = function(db)
-  
+
   local data = ngx.req.get_body_data()
   local org, name, email, password
   local pub_info = '{}'
@@ -96,13 +97,13 @@ _M.go = function(db)
     if params.pub_info then
       pub_info = cjson.encode(params.pub_info)
       if not pub_info then
-        return ngx_err('bad_input')
+        return say_err('bad_input')
       end
     end
     if params.priv_info then
       priv_info = cjson.encode(params.priv_info)
       if not priv_info then
-        return ngx_err('bad_input')
+        return say_err('bad_input')
       end
     end
     create(db, org, name, email, password, pub_info, priv_info)

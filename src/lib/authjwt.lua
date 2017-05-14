@@ -34,14 +34,12 @@ end
 _M.validate = validate
 
 _M.validate_cookie = function()
-  local token, parsed_token, field
   local cookie = ck:new()
 
-  field = cookie:get("access_token")
+  local field = cookie:get("access_token")
   if not field then
     return false
   end
-  for k, v in pairs(_M) do ngx.log(ngx.ERR, "KEY " .. k) end
   local verified, parsed_token = validate(field)
   if not parsed_token or not verified then
     return false

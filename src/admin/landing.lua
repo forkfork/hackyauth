@@ -1,4 +1,4 @@
-local tmpl = [[small auth
+--[[small auth
 
 * Small API. Just do auth, and do it well.
 * High uptime guarantee.
@@ -26,12 +26,15 @@ curl -X POST -d '{"username":"harmony","password":"hunter2"}' https://demo.small
 
 ]]
 
+local fp = io.open("smallauth.html")
+local page = fp:read("*a")
+
 local _M = {}
 
 _M.go = function()
 
-  ngx.say("hi")
-  ngx.say(ngx.var.http_host)
+  ngx.header['content-type'] = 'text.html'
+  ngx.say(page)
 
 end
 
