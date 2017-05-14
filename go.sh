@@ -40,6 +40,14 @@ curl -s --cookie "access_token=$JWT" -X POST http://127.0.0.1:8080/admin/apikey
 echo $JWT | wc -c
 
 curl -s -X POST -d '{"email":"user@example.com","org":"evilcorp"}' http://127.0.0.1:8080/forgot
+TOKEN=$(echo "select token from password_reset;" | mysql -u tim test | tail -n 1)
+echo "token is $TOKEN"
+
+curl -s -X POST -d "{\"token\":\"$TOKEN\",\"password\":\"hunter3\"}" http://127.0.0.1:8080/reset
+
+curl -s -X POST -d '{"email":"user@example.com","password":"hunter3","org":"evilcorp"}' \
+  http://127.0.0.1:8080/login
+
 # email is sent
 
 #tail -n 20 ./logs/error.log

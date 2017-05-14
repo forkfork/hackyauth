@@ -35,3 +35,15 @@ CREATE TABLE apikey (
   token varchar(32) NOT NULL,
   description varchar(255)
 ) DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS password_reset;
+CREATE TABLE password_reset (
+  org_name varchar(32) NOT NULL,
+  email char(255) NOT NULL,
+  token varchar(32) NOT NULL,
+  status varchar(8) default 'active',
+  expiry timestamp NOT NULL
+) DEFAULT CHARSET=utf8;
+
+CREATE UNIQUE INDEX password_reset_org_id ON password_reset(org_name, email);
+CREATE UNIQUE INDEX password_reset_token ON password_reset(token);

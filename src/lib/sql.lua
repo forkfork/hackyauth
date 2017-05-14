@@ -23,8 +23,9 @@ _M.query = function(db, sql, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)
     arg4 and ngx.quote_sql_str(arg4),
     arg5 and ngx.quote_sql_str(arg5),
     arg6 and ngx.quote_sql_str(arg6),
-    arg6 and ngx.quote_sql_str(arg7),
-    arg7 and ngx.quote_sql_str(arg8))
+    arg7 and ngx.quote_sql_str(arg7),
+    arg8 and ngx.quote_sql_str(arg8))
+  --ngx.log(ngx.ERR, fmted_sql)
   res, err, errcode, sqlstate = db:query(fmted_sql)
   if not res then
     ngx.log(ngx.ERR, "failed to query: " .. tostring(err) .. " errcode: " .. tostring(errcode) .. " sqlstate: " .. tostring(sqlstate))
