@@ -5,6 +5,7 @@ local resty_random = require('resty.random')
 local str = require('resty.string')
 local ck = require('resty.cookie')
 local uuid = require('lib/uuid')
+local tokens = require('lib/token')
 local say_err = require('lib/errs')
 local authjwt = require('lib/authjwt')
 
@@ -28,10 +29,8 @@ local create_query = [[
     email,
     password,
     salt,
-    pub_info,
-    priv_info
+    info
   ) VALUES (
-    %s,
     %s,
     %s,
     %s,
@@ -42,7 +41,7 @@ local create_query = [[
   );
 ]]
 
-local function create(db, org_name, name, email, password, pub_info, priv_info)
+local function create(db, red, org_name, name, email, password, info)
 
   local _, res, err
   local cookie, _ = ck:new()
@@ -65,13 +64,13 @@ local function create(db, org_name, name, email, password, pub_info, priv_info)
     assert(email, "email"),
     assert(hashed_pwd, "hashed_pwd"),
     assert(salt, "salt"),
-    assert(pub_info, "pub_info"),
-    assert(priv_info, "priv_info"))
+    assert(info, "info"))
   if err == 1062 then
     return say_err('already_registered')
   end
 
-  local token = authjwt.sign(user_id, org_name, cjson.decode(pub_info))
+  --local token = authjwt.sign(user_id, org_name, cjson.decode(pub_info))
+  local token = tokens.create(red, user_id, email, org_name, info)
   cookie:set({
     key = "access_token",
     value = token,
@@ -82,31 +81,24 @@ local function create(db, org_name, name, email, password, pub_info, priv_info)
 
 end
 
-_M.go = function(db)
+_M.go = function(db, red)
 
   local data = ngx.req.get_body_data()
   local org, name, email, password
-  local pub_info = '{}'
-  local priv_info = '{}'
+  local info = '{}'
   local params = cjson.decode(data)
   if params then
     org = params.org
     name = params.name
     email = params.email
     password = params.password
-    if params.pub_info then
-      pub_info = cjson.encode(params.pub_info)
-      if not pub_info then
+    if params.info then
+      info = cjson.encode(params.info)
+      if not info then
         return say_err('bad_input')
       end
     end
-    if params.priv_info then
-      priv_info = cjson.encode(params.priv_info)
-      if not priv_info then
-        return say_err('bad_input')
-      end
-    end
-    create(db, org, name, email, password, pub_info, priv_info)
+    create(db, red, org, name, email, password, info)
   else
     ngx.say([[{"code":"provide json body with org, name, email, password}"}]])
   end

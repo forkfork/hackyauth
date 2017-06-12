@@ -6,8 +6,7 @@ CREATE TABLE user (
   email varchar(255),
   password text,
   salt text,
-  pub_info varchar(2048) DEFAULT '{}',
-  priv_info varchar(2048) DEFAULT '{}'
+  info varchar(2048) DEFAULT '{}'
 ) DEFAULT CHARSET=utf8;
 
 CREATE UNIQUE INDEX user_org_email ON user(org_name, email);
@@ -18,8 +17,6 @@ CREATE TABLE org (
   name varchar(32),
   cert text,
   primary_email varchar(255),
-  private_key text,
-  public_key text,
   status varchar(32) DEFAULT 'pending',
   region varchar(32) DEFAULT 'us-west-1'
 ) DEFAULT CHARSET=utf8;

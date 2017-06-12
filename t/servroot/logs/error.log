@@ -1,0 +1,23 @@
+2017/06/12 20:34:40 [notice] 22789#0: using the "epoll" event method
+2017/06/12 20:34:40 [notice] 22789#0: openresty/1.11.2.2
+2017/06/12 20:34:40 [notice] 22789#0: built by gcc 6.2.0 20161005 (Ubuntu 6.2.0-5ubuntu12) 
+2017/06/12 20:34:40 [notice] 22789#0: OS: Linux 4.10.0-21-generic
+2017/06/12 20:34:40 [notice] 22789#0: getrlimit(RLIMIT_NOFILE): 1024:65536
+2017/06/12 20:34:40 [error] 22790#0: *1 [lua] cookie.lua:102: new(): COOKIE IS nil, client: 127.0.0.1, server: localhost, request: "POST /login HTTP/1.1", host: "localhost"
+2017/06/12 20:34:40 [error] 22790#0: *1 [lua] sql.lua:29: query():   SELECT
+    user_id,
+    password,
+    salt,
+    info
+  FROM
+    user
+  WHERE
+    email = 'user@example.com' AND
+    org_name = 'evilcorp';
+, client: 127.0.0.1, server: localhost, request: "POST /login HTTP/1.1", host: "localhost"
+2017/06/12 20:34:40 [error] 22790#0: *1 [lua] login.lua:43: login(): creating a token with email: user@example.com, client: 127.0.0.1, server: localhost, request: "POST /login HTTP/1.1", host: "localhost"
+2017/06/12 20:34:40 [error] 22790#0: *1 [lua] token.lua:36: create(): setting token to W1AQELRnw3Q:user@example.com:evilcorp:{"a":1}, client: 127.0.0.1, server: localhost, request: "POST /login HTTP/1.1", host: "localhost"
+2017/06/12 20:34:41 [notice] 22790#0: signal 3 (SIGQUIT) received, shutting down
+2017/06/12 20:34:41 [notice] 22790#0: signal 15 (SIGTERM) received, exiting
+2017/06/12 20:34:41 [info] 22790#0: epoll_wait() failed (4: Interrupted system call)
+2017/06/12 20:34:41 [notice] 22790#0: exit
